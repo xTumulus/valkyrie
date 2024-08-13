@@ -8,7 +8,8 @@ except ImportError or ValueError as exc:
     print('Error: Dependencies not met.', exc)
     sys.exit(1)
 
-from device import Device
+from camera import Camera
+from camera_controller_interface import CameraControllerInterface
 
 class MainWindow(Gtk.ApplicationWindow):
 
@@ -67,19 +68,30 @@ class MainWindow(Gtk.ApplicationWindow):
         print('created window')
 
     def on_click_scan(self, clicked_button):
-        devices = self.getv4lDevices()
+        cameras = self.getCameras()
         # idea is to create a tab in the header for each device
-        for device in devices:
-            button = Gtk.Button(label = device.name)
-            button.connect('clicked', self.on_click_device, device.name)
-            self.tabBar.append(button)
-        # self.props.show_menubar = True
+        print(cameras)
+        if cameras.count == 0:
+            print("no cameras found")
+            # some display for this message
+        else:
+            for camera in cameras:
+                print(camera)
+                button = Gtk.Button(label = camera.name)
+                button.connect('clicked', self.on_click_camera, camera)
+                self.tabBar.append(button)
+                # self.props.show_menubar = True
 
     # TODO move this to a v4l interface class
-    def getv4lDevices(self):
-        print('getting v4l devices')
-        return [Device('Webcam 1', []), Device('Webcam 2', []), Device('Webcam 3', [])]
+    def getCameras(self):
+        print('getting cameras')
+        return CameraControllerInterface.getCameras()
+        # return [Device('Webcam 1', []), Device('Webcam 2', []), Device('Webcam 3', [])]
 
-    def on_click_device(self, clicked_button, deviceName):
-        print('clicked device: ' + deviceName)
-        self.contentBox
+    def on_click_camera(self, clicked_button, camera):
+        print('clicked camera: ' + camera.name)
+        # for (attribute in device.attributes):
+            #create a new row
+            #title = attribute_name
+            #display (slider, checkbox, etc) = attribute type
+            #value = attribute value
